@@ -1,4 +1,4 @@
-document.querySelector('button').addEventListener('click', beginSurvey);
+document.querySelector('#beginSurvey').addEventListener('click', beginSurvey);
 document.querySelector('#menToSurvey').addEventListener('change', reformatNumber);
 document.querySelector('#womenToSurvey').addEventListener('change', reformatNumber);
 
@@ -9,6 +9,7 @@ function reformatNumber() {
     this.value = 0;
   }
 }
+
 async function beginSurvey() {
   let arrMaleAnswers = await getMaleSurveyAnswers();
   let arrFemaleAnswers = await getFemaleSurveyAnswers();
@@ -24,10 +25,34 @@ async function beginSurvey() {
     }
   });
 
-  for(key of arrSortedSurveyAnswers) {
-    console.log(`${key.firstname} ${key.lastname}`);
+  /*  for(key of arrSortedSurveyAnswers) {
+      console.log(`${key.firstname} ${key.lastname}`);
+    } */
+
+    //Get list of all countries that the surveyed subjects are from
+     let objCountrySurvey = arrSortedSurveyAnswers.reduce((object, countryName) => {
+      if(object[countryName.address.country] >= 1) {
+          object[countryName.address.country]++;
+      } else {
+          object[countryName.address.country] = 1
+      }
+
+      return object;
+    },{})
+
+    let largestGroupCnt = 0;
+    let largestGroup = "N/A";
+    for(country in objCountrySurvey) {
+      if(objCountrySurvey[country] > largestGroupCnt) {
+        largestGroup = country;
+        largestGroupCnt = objCountrySurvey[country];
+      } else if(objCountrySurvey[country] === largestGroupCnt) {
+        largestGroup = `${largestGroup}, ${country}`;
+      }
+    }
+
+    document.querySelector('h2').innerText = `The countries with the most residents are: ${largestGroup}`;
   }
-}
 
 async function getMaleSurveyAnswers() {
   const surveyMaleCount = document.querySelector('#menToSurvey').value;

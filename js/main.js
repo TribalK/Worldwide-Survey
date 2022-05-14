@@ -11,10 +11,12 @@ function reformatNumber() {
 }
 
 async function beginSurvey() {
+  //Using async-await functions in order to process both male and female survey answers without displaying the data prematurely.
   let arrMaleAnswers = await getMaleSurveyAnswers();
   let arrFemaleAnswers = await getFemaleSurveyAnswers();
   let arrSurveyAnswers = arrMaleAnswers.concat(arrFemaleAnswers);
 
+  // Sort answers for later display
   arrSortedSurveyAnswers = arrSurveyAnswers.sort((a,b) => {
     if(a.lastname > b.lastname) {
       return 1;
@@ -31,6 +33,7 @@ async function beginSurvey() {
 
     //Get list of all countries that the surveyed subjects are from
      let objCountrySurvey = arrSortedSurveyAnswers.reduce((object, countryName) => {
+       //if we do not have the country yet in an object, insert it with a size of 1
       if(object[countryName.address.country] >= 1) {
           object[countryName.address.country]++;
       } else {
@@ -67,13 +70,6 @@ async function getMaleSurveyAnswers() {
   }
 }
 
-async function caller(count, gender) {
-  return fetch(`https://fakerapi.it/api/v1/persons?_quantity=${count}&_gender=${gender}`)
-  .then(res => {
-    return res.json();
-  })
-}
-
 async function getFemaleSurveyAnswers() {
   const surveyFemaleCount = document.querySelector('#womenToSurvey').value;
 
@@ -84,4 +80,12 @@ async function getFemaleSurveyAnswers() {
   } else {
     return [];
   }
+}
+
+// Asynchronous caller function that fetches the api of the specified the number of times asked
+async function caller(count, gender) {
+  return fetch(`https://fakerapi.it/api/v1/persons?_quantity=${count}&_gender=${gender}`)
+  .then(res => {
+    return res.json();
+  })
 }
